@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自動發送訊息</title>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+    <h3>傳送中，請稍候...</h3>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoSend = urlParams.get('auto');
+        const messageText = urlParams.get('text');
+
+        liff.init({ liffId: '你的LIFF_ID' })
+            .then(() => {
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else if (autoSend === 'yes' && messageText && liff.isInClient()) {
+                    liff.sendMessages([{
+                        type: 'text',
+                        text: decodeURIComponent(messageText)
+                    }]).then(() => {
+                        liff.closeWindow();
+                    }).catch((err) => {
+                        alert('發送失敗: ' + JSON.stringify(err));
+                    });
+                } else {
+                    document.body.innerHTML = '<h3>請在 LINE App 中開啟此連結</h3>';
+                }
+            })
+            .catch((err) => {
+                document.body.innerHTML = '<h3>初始化失敗: ' + err + '</h3>';
+            });
+    </script>
+</body>
+</html>
